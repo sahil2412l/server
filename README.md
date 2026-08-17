@@ -1,18 +1,15 @@
-# Secure Express Backend Server
+# Class 10 Math Express Backend Server 🚀
 
-Enterprise-grade, secure Node.js + Express backend API with JWT Authentication, Payments, Messaging, File Uploads, Coins & Rank Engine, and Location Tracking.
+Express.js backend server integrated with MongoDB Atlas for the **Class 10 Math CBSE Mobile Application**.
 
-## 🚀 Features
+## 🌟 Key Features
 
-- 🔐 **Dual-Login Auth**: Register and log in using either **Username** or **Mobile Number** with Password.
-- 🛡️ **Security Stack**: Helmet HTTP headers, Rate Limiting (Brute-force protection), NoSQL injection defense, and input validation.
-- 🪵 **Winston Logging**: Structured logging to console and rotated file logs (`logs/error.log`, `logs/combined.log`).
-- 💎 **Coins & Rank Engine**: Auto-calculated ranks based on coin balance (Bronze, Silver, Gold, Platinum, Diamond).
-- 💳 **Payments & Discounts**: Purchase coins, apply promo codes, and record transaction history.
-- 💬 **Messaging System**: Direct messaging between users with read state tracking.
-- 📁 **File Uploads**: Secure Multer file upload with type whitelist and 5MB limit.
+- 🔐 **User Authentication**: JWT-based secure Register, Login, and Profile retrieval (`/api/auth/register`, `/api/auth/login`, `/api/auth/me`).
+- 🏆 **Gamification & Leaderboard**: Track user XP points, daily streaks, level progression, and global rankings (`/api/leaderboard`, `/api/user/points`).
+- ❓ **Student Doubts System**: Submit chapter doubts and query status (`/api/doubts`).
+- 🍃 **MongoDB Atlas Integration**: Live persistent cloud database.
 
-## 🛠️ Quick Start
+## 🛠️ Getting Started
 
 ### 1. Install Dependencies
 ```bash
@@ -20,35 +17,24 @@ npm install
 ```
 
 ### 2. Environment Variables (`.env`)
+Create a `.env` file in the root of the server directory:
 ```env
 PORT=5000
-NODE_ENV=development
-MONGO_URI=mongodb://localhost:27017/secure_backend_db
-JWT_SECRET=super_secret_jwt_key_12345
-JWT_EXPIRES_IN=7d
-CORS_ORIGIN=*
+MONGODB_URI=mongodb+srv://<username>:<password>@cluster.mongodb.net/class10math?retryWrites=true&w=majority
+JWT_SECRET=class10_secret_jwt_key_2026
 ```
 
-### 3. Run via Docker / Docker Compose
+### 3. Run Server
 ```bash
-# Build and run containerized Backend + MongoDB stack
-docker-compose up --build
-```
-
-### 4. Run Locally without Docker
-```bash
-# Development Mode
+# Development Mode (auto-reload)
 npm run dev
 
 # Production Mode
 npm start
 ```
 
-## 🌐 Deploying to Render.com
+## 🌐 Deployment
 
-1. Push code to GitHub repository.
-2. Open [Render Dashboard](https://render.com) and click **New +** -> **Web Service**.
-3. Connect repository `sahil2412l/server`.
-4. Configure Build Command: `npm install` and Start Command: `npm start`.
-5. Set Environment Variables (`MONGO_URI`, `JWT_SECRET`, `NODE_ENV=production`).
-6. Click **Deploy**.
+Deployable to [Render](https://render.com), [Railway](https://railway.app), or any Node.js host.
+- Build Command: `npm install`
+- Start Command: `npm start`
