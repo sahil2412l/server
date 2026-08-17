@@ -29,7 +29,13 @@ JWT_EXPIRES_IN=7d
 CORS_ORIGIN=*
 ```
 
-### 3. Run Locally
+### 3. Run via Docker / Docker Compose
+```bash
+# Build and run containerized Backend + MongoDB stack
+docker-compose up --build
+```
+
+### 4. Run Locally without Docker
 ```bash
 # Development Mode
 npm run dev

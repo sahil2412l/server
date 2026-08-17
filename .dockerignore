@@ -1,0 +1,28 @@
+# Node.js dependencies
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Environment files
+.env
+.env.local
+.env.*.local
+
+# Git & Version Control
+.git/
+.gitignore
+
+# Uploads & Logs
+public/uploads/
+logs/
+
+# Testing & Scratch files
+test_api.js
+scratch/
+
+# IDE & OS files
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
