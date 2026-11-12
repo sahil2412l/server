@@ -24,6 +24,11 @@ const coinSchema = new mongoose.Schema(
       required: [true, 'Task ID or reason is required'],
       trim: true,
     },
+    tenantId: {
+      type: String,
+      default: 'tenant-default',
+      index: true,
+    },
     taskName: {
       type: String,
       required: true,

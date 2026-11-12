@@ -2,6 +2,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { Coin } from '../models/Coin.js';
 import { CoinLog } from '../models/CoinLog.js';
 import { broadcastCoinEarned } from '../sockets/socketHandler.js';
+import { sanitizeString } from '../utils/sanitizer.js';
 
 // Helper to generate unique structured coin ID
 const generateUniqueCoinId = () => {
@@ -103,6 +104,14 @@ export const verifyCoin = async (req, res, next) => {
   try {
     const { coinId } = req.params;
 
+    if (!coinId || typeof coinId !== 'string') {
+      return res.status(400).json({
+        success: false,
+        isValid: false,
+        error: 'Please provide a valid coinId string',
+      });
+    }
+
     const coin = await Coin.findOne({
       coinId: coinId.trim().toUpperCase(),
       user: req.user._id,
@@ -139,10 +148,10 @@ export const verifyAndUseCoin = async (req, res, next) => {
   try {
     const { coinId, purpose = 'Redemption' } = req.body;
 
-    if (!coinId) {
+    if (!coinId || typeof coinId !== 'string') {
       return res.status(400).json({
         success: false,
-        error: 'Please provide the coinId to use',
+        error: 'Please provide a valid string coinId to use',
       });
     }
 

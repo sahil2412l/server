@@ -17,6 +17,11 @@ const coinLogSchema = new mongoose.Schema(
       required: true,
       index: true,
     },
+    tenantId: {
+      type: String,
+      default: 'tenant-default',
+      index: true,
+    },
     taskId: {
       type: String,
       required: true,

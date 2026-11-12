@@ -5,7 +5,10 @@
   "main": "server.js",
   "scripts": {
     "start": "node src/server.js",
-    "dev": "node --watch src/server.js"
+    "dev": "node --watch src/server.js",
+    "test": "node test_server.js",
+    "test:gateway": "node test_gateway.js",
+    "test:all": "node test_server.js && node test_gateway.js"
   },
   "keywords": [],
   "author": "",
@@ -27,6 +30,7 @@
     "uuid": "^14.0.2"
   },
   "devDependencies": {
+    "mongodb-memory-server": "^11.3.0",
     "socket.io-client": "^4.8.3"
   }
 }

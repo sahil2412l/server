@@ -4,6 +4,7 @@ import {
   generateRefreshToken,
   verifyRefreshToken,
 } from '../config/jwt.config.js';
+import { validatePasswordStrength, sanitizeString } from '../utils/sanitizer.js';
 
 // Cookie options for security (Cross-domain friendly for production)
 const isProduction = process.env.NODE_ENV === 'production';
@@ -21,11 +22,32 @@ export const register = async (req, res, next) => {
   try {
     const { userId, email, phoneNumber, password, name, avatar } = req.body;
 
-    // 1. Validation
+    // 1. Validation of required primitive fields
     if (!userId || !email || !phoneNumber || !password) {
       return res.status(400).json({
         success: false,
         error: 'Please provide userId, email, phoneNumber, and password',
+      });
+    }
+
+    if (
+      typeof userId !== 'string' ||
+      typeof email !== 'string' ||
+      typeof phoneNumber !== 'string' ||
+      typeof password !== 'string'
+    ) {
+      return res.status(400).json({
+        success: false,
+        error: 'Invalid input types. All fields must be strings.',
+      });
+    }
+
+    // Password strength enforcement
+    const pwdValidation = validatePasswordStrength(password);
+    if (!pwdValidation.isValid) {
+      return res.status(400).json({
+        success: false,
+        error: pwdValidation.message,
       });
     }
 
@@ -52,8 +74,8 @@ export const register = async (req, res, next) => {
       email: email.toLowerCase().trim(),
       phoneNumber: phoneNumber.trim(),
       password,
-      name: name || userId,
-      avatar: avatar || '🎓',
+      name: sanitizeString(name) || userId,
+      avatar: sanitizeString(avatar, 20) || '🎓',
     });
 
     // 4. Generate Tokens
@@ -98,15 +120,16 @@ export const register = async (req, res, next) => {
 // @access  Public
 export const login = async (req, res, next) => {
   try {
-    const { identifier, email, userId, password } = req.body;
-
+    const { identifier, email, userId, password } = req.body || {};
     const loginId = identifier || email || userId;
-    if (!loginId || !password) {
+    if (!loginId || !password || typeof loginId !== 'string' || typeof password !== 'string') {
       return res.status(400).json({
         success: false,
         error: 'Please provide email or userId, and password',
       });
     }
+
+    const genericAuthError = 'Invalid credentials. Please verify your email/userId and password.';
 
     // Find by either email or userId
     const user = await User.findOne({
@@ -119,7 +142,7 @@ export const login = async (req, res, next) => {
     if (!user) {
       return res.status(401).json({
         success: false,
-        error: 'Invalid credentials. User not found.',
+        error: genericAuthError,
       });
     }
 
@@ -128,7 +151,7 @@ export const login = async (req, res, next) => {
     if (!isMatch) {
       return res.status(401).json({
         success: false,
-        error: 'Invalid password. Authentication failed.',
+        error: genericAuthError,
       });
     }
 

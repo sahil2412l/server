@@ -2,13 +2,19 @@ import { verifyAccessToken } from '../config/jwt.config.js';
 import { User } from '../models/User.js';
 
 export const protect = async (req, res, next) => {
+  // 1. Gateway Security Offloading Fast-Path:
+  // If request has already been authenticated at the Gateway boundary
+  if (req.user && req.user._id) {
+    return next();
+  }
+
   let token = null;
 
-  // 1. Check Authorization Header (Bearer token)
+  // 2. Check Authorization Header (Bearer token)
   if (req.headers.authorization && req.headers.authorization.startsWith('Bearer ')) {
     token = req.headers.authorization.split(' ')[1];
   } else if (req.cookies?.accessToken) {
-    // 2. Or check cookies if present
+    // 3. Or check cookies if present
     token = req.cookies.accessToken;
   }
 
@@ -16,6 +22,7 @@ export const protect = async (req, res, next) => {
     return res.status(401).json({
       success: false,
       error: 'Not authorized! No authentication token provided.',
+      correlationId: req.correlationId,
     });
   }
 
@@ -27,6 +34,7 @@ export const protect = async (req, res, next) => {
       return res.status(401).json({
         success: false,
         error: 'User belonging to this token no longer exists.',
+        correlationId: req.correlationId,
       });
     }
 
@@ -34,6 +42,7 @@ export const protect = async (req, res, next) => {
       return res.status(403).json({
         success: false,
         error: 'Your account has been deactivated.',
+        correlationId: req.correlationId,
       });
     }
 
@@ -45,11 +54,13 @@ export const protect = async (req, res, next) => {
         success: false,
         error: 'Access Token has expired. Please refresh your token.',
         isExpired: true,
+        correlationId: req.correlationId,
       });
     }
     return res.status(401).json({
       success: false,
       error: 'Invalid token authentication failed.',
+      correlationId: req.correlationId,
     });
   }
 };
@@ -61,6 +72,7 @@ export const adminOnly = (req, res, next) => {
     res.status(403).json({
       success: false,
       error: 'Access denied: Administrator privileges required.',
+      correlationId: req.correlationId,
     });
   }
 };

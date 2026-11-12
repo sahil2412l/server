@@ -45,3 +45,11 @@ coverage/
 dist/
 build/
 *.tsbuildinfo
+
+
+# Scratch / Media / Temp files
+*.mp3
+*.mp4
+*.png
+*.py
+*.code-workspace

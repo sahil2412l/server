@@ -11,6 +11,11 @@ const feedbackSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
+    tenantId: {
+      type: String,
+      default: 'tenant-default',
+      index: true,
+    },
     authorName: {
       type: String,
       default: 'Anonymous',

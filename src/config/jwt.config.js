@@ -1,5 +1,17 @@
 import jwt from 'jsonwebtoken';
 
+const isProduction = process.env.NODE_ENV === 'production';
+
+// Production security check for static/default secrets
+if (isProduction) {
+  if (!process.env.JWT_ACCESS_SECRET || process.env.JWT_ACCESS_SECRET.includes('default')) {
+    console.warn('⚠️ SECURITY WARNING: Insecure or default JWT_ACCESS_SECRET in production!');
+  }
+  if (!process.env.JWT_REFRESH_SECRET || process.env.JWT_REFRESH_SECRET.includes('default')) {
+    console.warn('⚠️ SECURITY WARNING: Insecure or default JWT_REFRESH_SECRET in production!');
+  }
+}
+
 export const jwtConfig = {
   accessSecret: process.env.JWT_ACCESS_SECRET || 'default_access_secret_key_2026',
   refreshSecret: process.env.JWT_REFRESH_SECRET || 'default_refresh_secret_key_2026',
