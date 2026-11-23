@@ -1,104 +1,133 @@
-# 🚀 Enterprise Best-Practice Backend Architecture with API Gateway
+# Production-Ready Zero Trust Microservices Backend Architecture 🛡️🚀
 
-A production-grade, highly scalable Node.js & Express backend architecture fully aligned with the **Industry Standard Best-Practice Backend Architecture with API Gateway** specification.
-
-Featuring **API Gateway Perimeter**, **WAF / Firewall**, **Service Discovery**, **Dynamic Load Balancing**, **Distributed Caching (Redis)**, **Asynchronous Messaging Event Bus (AMQP/Kafka style)**, **Prometheus Observability**, **Circuit Breaker Resilience**, and **Multi-Tenancy with BFF (Backend-for-Frontend)**.
+This repository contains the complete Infrastructure-as-Code (IaC) and containerized implementation of a highly secure, enterprise-grade microservices backend ecosystem.
 
 ---
 
-## 🏛️ System Architecture Alignment Map
+## 🏛️ System Architecture Overview
 
 ```
-                    ┌────────────────────────────────────────────────────────┐
-                    │               CLIENT APPLICATIONS                      │
-                    │   📱 Mobile  │  💻 Web Portal  │  📡 IoT / Admin API   │
-                    └───────────────────────────┬────────────────────────────┘
-                                                │
-                                    ┌───────────▼────────────┐
-                                    │     FIREWALL / WAF     │
-                                    │ (SQLi, XSS, Scanners)  │
-                                    └───────────┬────────────┘
-                                                │
-                    ┌───────────────────────────▼────────────────────────────┐  ◄───► ┌─────────────────────────┐
-                    │                   API GATEWAY LAYER                    │        │ CROSS-CUTTING SERVICES  │
-                    │  (/api/gateway)                                        │        │                         │
-                    │                                                        │        │ 🔐 Identity Provider    │
-                    │  1. Authentication & Authorization (OAuth2/JWT)        │        │    (Dual Token Rotation)│
-                    │  2. Dynamic Rate Limiting (Sliding-Window Per-Tenant)  │        │ 🛰️ Service Discovery    │
-                    │  3. Request Routing (Services & BFF Aggregators)       │        │    (Microservice Reg)   │
-                    │  4. Dynamic Load Balancing (Round-Robin / Weights)     │        │ 📊 Observability        │
-                    │  5. Distributed Tracing (x-correlation-id)             │        │    (Prometheus/Grafana) │
-                    └───────────────────────────┬────────────────────────────┘  ◄───► └─────────────────────────┘
-                                                │
-                    ┌───────────────────────────▼────────────────────────────┐
-                    │                   MICROSERVICES TIER                   │
-                    │                                                        │
-                    │   [ User Service ]          [ Coin / Wallet Service ]  │
-                    │   [ Feedback Service ]      [ Tenant Governance ]      │
-                    │   [ Mobile & Web BFFs ]     [ Socket.IO Real-Time ]    │
-                    └───────────────────────────┬────────────────────────────┘
-                                                │
-                    ┌───────────────────────────▼────────────────────────────┐
-                    │     INTERNAL MESSAGING & SERVICE MESH (AMQP/Kafka)     │
-                    │  Asynchronous Event Bus • Pub/Sub • Dead-Letter Queue  │
-                    └───────────────────────────┬────────────────────────────┘
-                                                │
-                    ┌───────────────────────────▼────────────────────────────┐
-                    │               DATA & DISTRIBUTED CACHE LAYER           │
-                    │                                                        │
-                    │   🍃 MongoDB Atlas          ⚡ Redis / Cache Engine    │
-                    │   (Tenant Partitioned)      (Sub-ms BFF Cache Hits)    │
-                    └────────────────────────────────────────────────────────┘
+                        [ Inbound Web / Mobile Traffic ]
+                                       │
+                                       ▼ (Port 80 / 443)
+                      ┌──────────────────────────────────┐
+                      │    API Gateway (Nginx Reverse    │
+                      │    Proxy & Rate Limiting Zone)   │
+                      └────────────────┬─────────────────┘
+                                       │
+        ══════════════════════ PRIVATE SUBNET VPC ══════════════════════
+               │                       │                       │
+               ▼                       ▼                       ▼
+      ┌─────────────────┐     ┌─────────────────┐     ┌─────────────────┐
+      │ Server 1 (Core) │     │Server 2 (Resrv) │     │Server 3(Payment)│
+      │   Port 8001     │     │   Port 8002     │     │   Port 8003     │
+      └────────┬────────┘     └─────────────────┘     └────────┬────────┘
+               │                                               │
+               ├──────────────────┐                            ▼
+               ▼                  ▼                   ┌─────────────────┐
+      ┌─────────────────┐ ┌───────────────┐           │   payment_db    │
+      │     core_db     │ │  Redis Queue  │           │ (PostgreSQL 16) │
+      │ (PostgreSQL 16) │ │  (Port 6379)  │           └─────────────────┘
+      └─────────────────┘ └───────┬───────┘
+                                  │
+                                  ▼
+                         ┌─────────────────┐          ┌─────────────────┐
+                         │ Server 5 (AI)   │          │Server 4 (Resrv) │
+                         │   Port 8005     │          │   Port 8004     │
+                         └─────────────────┘          └─────────────────┘
+        ════════════════════════════════════════════════════════════════
 ```
 
 ---
 
-## 🌟 Key Architectural Components (Image Alignment)
+## 🔒 Zero Trust Network & Security Enforcements
 
-### 1. Ingress Firewall / WAF
-- **File:** `src/gateway/middlewares/waf.js`
-- Deep inspection of query parameters, headers, and request bodies.
-- Blocks SQL injection (`UNION SELECT`, `OR 1=1`), Path Traversal (`../`), and Automated Vulnerability Scanners (`sqlmap`, `nikto`).
-- Sets `X-WAF-Protection: Active` and `X-WAF-Status: PASS`.
-
-### 2. Service Discovery & Registry
-- **File:** `src/gateway/discovery/serviceRegistry.js`
-- Endpoint: `GET /api/gateway/discovery`
-- Dynamic registration and discovery of microservices (`auth-service`, `coin-service`, `feedback-service`, `tenant-service`).
-- Periodic heartbeat monitoring and automated instance health evaluation.
-
-### 3. Gateway Load Balancing
-- **File:** `src/gateway/loadbalancer/loadBalancer.js`
-- Endpoint: `GET /api/gateway/loadbalancer/status`
-- Dynamic load distribution strategies: `round-robin`, `least-connections`, and `random`.
-- Automatically skips `DOWN` instances discovered via the Service Registry.
-
-### 4. Distributed Caching Layer (Redis Cache)
-- **File:** `src/config/cache.js`
-- Endpoint: `GET /api/gateway/cache/stats`
-- High-throughput distributed caching layer with automated Redis integration and sub-millisecond in-memory cache engine fallback.
-- Caches BFF Mobile and Web aggregated payloads, cutting response latency from 10ms to <1ms on cache hits (`X-Cache: HIT`).
-
-### 5. Lightweight Messaging / Internal Event Bus (AMQP / Message Queue / Kafka)
-- **File:** `src/gateway/messaging/eventBus.js`
-- Decoupled asynchronous event broker with Pub/Sub and Dead-Letter Queue (DLQ).
-- Publishes events like `coin.earned`, `coin.redeemed`, `feedback.created`, and `circuit.state_change`.
-
-### 6. Monitoring & Observability (Prometheus & Grafana)
-- **File:** `src/gateway/monitoring/metrics.js`
-- Endpoints:
-  - `GET /api/gateway/metrics` — Standard Prometheus exposition format.
-  - `GET /api/gateway/metrics/json` — Observability telemetry JSON.
-- Exposes metrics for request counts, duration histograms, circuit breaker states, heap memory, and cache hit rates.
+1. **Strict Ingress Isolation:**
+   - ONLY the **API Gateway** exposes public host ports (`80` / `443`).
+   - None of the 5 backend servers, neither PostgreSQL database, nor Redis expose any public host ports.
+   - All backend microservices reside in `private_backend_net`.
+2. **Rate Limiting Zones:**
+   - **General APIs (`/api/v1/core/`, `/api/v1/ai/`):** 30 requests/second per IP.
+   - **Payment APIs (`/api/v1/payments/`):** Strict 5 requests/minute per IP to prevent card testing and brute force attacks.
+3. **Hardened Containers:**
+   - Every microservice runs as an unprivileged non-root user (`appuser:1000`).
+   - Strict health checks configured on all Docker containers.
+4. **Payment Integrity (ACID Ledger & Webhook Verification):**
+   - Double-entry immutable financial ledger (`customer_accounts`, `financial_ledger`).
+   - Payment webhooks verified via HMAC-SHA256 signature matching.
 
 ---
 
-## 🚀 Running Tests
+## 🧩 Microservice Roster
+
+| Service | Container Name | Port (Private) | Purpose |
+| :--- | :--- | :--- | :--- |
+| **Gateway** | `api_gateway` | 80 / 443 | Entry point, SSL termination, rate limiting, routing |
+| **Server 1** | `server1_core` | 8001 | Core business logic, user auth, dispatches jobs to Redis |
+| **Server 2** | `server2_reserved`| 8002 | Reserved for Auth & Notifications (Horizontal Scaling) |
+| **Server 3** | `server3_payment` | 8003 | Dedicated Payment Service, ACID Ledger, HMAC Webhooks |
+| **Server 4** | `server4_reserved`| 8004 | Reserved for Analytics, Event Logging & Aggregation |
+| **Server 5** | `server5_ai` | 8005 | AI Automation Worker, LLM pipeline orchestration |
+| **Queue** | `redis_queue` | 6379 | In-memory message broker between Server 1 and Server 5 |
+| **Core DB** | `core_db` | 5432 | PostgreSQL 16 for core application tables |
+| **Payment DB**| `payment_db` | 5432 | Dedicated PostgreSQL 16 for financial ledger |
+| **Prometheus**| `prometheus_monitoring` | 9090 | Metrics collection & time-series scraping |
+| **Grafana** | `grafana_dashboards` | 3000 | Observability & metrics visualization |
+
+---
+
+## 🚀 Quick Start Deployment
+
+To deploy the entire stack with a single turnkey command:
 
 ```bash
-# 1. Run all 38 System, Gateway, WAF & Observability Tests:
-npm run test:all
+cd "/home/monkey/Downloads/General /backend_infrastructure"
+./deploy.sh
+```
 
-# 2. Run specifically the Gateway & Best-Practice Architecture Suite:
-npm run test:gateway
+Or manually using Docker Compose:
+
+```bash
+docker compose up -d --build
+```
+
+---
+
+## 📡 Gateway Routing Table
+
+| Path Pattern | Target Upstream | Description |
+| :--- | :--- | :--- |
+| `/health` | API Gateway | Ingress gateway status |
+| `/api/v1/core/*` | `server1_core:8001` | Core application APIs & job dispatching |
+| `/api/v1/reserved-auth/*` | `server2_reserved:8002` | Standby Auth / Notification microservice |
+| `/api/v1/payments/*` | `server3_payment:8003` | Charges, ACID ledger, invoices, HMAC webhooks |
+| `/api/v1/reserved-analytics/*` | `server4_reserved:8004` | Standby Analytics / Logging microservice |
+| `/api/v1/ai/*` | `server5_ai:8005` | AI Automation results & task status |
+
+---
+
+## 🧪 Testing Ingress Endpoints (Examples)
+
+### 1. Gateway Health Check
+```bash
+curl -i http://localhost/health
+```
+
+### 2. Dispatch Heavy Task from Server 1 to Server 5 (via Redis Queue)
+```bash
+curl -X POST http://localhost/api/v1/core/dispatch-task \
+  -H "Content-Type: application/json" \
+  -d '{"task_type": "ai_synthesis", "payload": {"query": "Analyze market trends"}}'
+```
+
+### 3. Check Task Status on Server 5
+```bash
+curl -i http://localhost/api/v1/ai/tasks/<TASK_ID>
+```
+
+### 4. Process Payment with ACID Ledger on Server 3
+```bash
+curl -X POST http://localhost/api/v1/payments/charge \
+  -H "Content-Type: application/json" \
+  -d '{"account_id": "00000000-0000-0000-0000-000000000001", "amount_cents": 4999, "currency": "USD", "description": "Enterprise Subscription"}'
 ```
