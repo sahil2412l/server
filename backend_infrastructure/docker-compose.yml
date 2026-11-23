@@ -1,0 +1,209 @@
+version: '3.8'
+
+# ==============================================================================
+# Production-Ready Zero Trust Microservices Backend Architecture
+# ONLY the API Gateway is exposed to public_net.
+# All backend microservices, DBs, and Redis strictly reside in private_backend_net.
+# ==============================================================================
+
+networks:
+  public_net:
+    driver: bridge
+  private_backend_net:
+    driver: bridge
+
+volumes:
+  core_db_data:
+  payment_db_data:
+  redis_data:
+  prometheus_data:
+  grafana_data:
+
+services:
+  # ----------------------------------------------------------------------------
+  # 1. API Gateway (Central Ingress, SSL Termination & Rate Limiting)
+  # ----------------------------------------------------------------------------
+  gateway:
+    build:
+      context: ./gateway
+      dockerfile: Dockerfile
+    container_name: api_gateway
+    ports:
+      - "${GATEWAY_HTTP_PORT:-80}:80"
+    networks:
+      - public_net
+      - private_backend_net
+    depends_on:
+      - server1_core
+      - server2_reserved
+      - server3_payment
+      - server4_reserved
+      - server5_ai
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost/health"]
+      interval: 15s
+      timeout: 5s
+      retries: 3
+
+  # ----------------------------------------------------------------------------
+  # 2. Server 1: Core Application Service
+  # ----------------------------------------------------------------------------
+  server1_core:
+    build:
+      context: ./services/server1_core
+      dockerfile: Dockerfile
+    container_name: server1_core
+    environment:
+      - DB_HOST=core_db
+      - DB_USER=${POSTGRES_USER}
+      - DB_PASSWORD=${POSTGRES_PASSWORD}
+      - DB_NAME=${CORE_DB_NAME}
+      - REDIS_HOST=${REDIS_HOST}
+      - REDIS_PORT=${REDIS_PORT}
+      - REDIS_PASSWORD=${REDIS_PASSWORD}
+    networks:
+      - private_backend_net
+    depends_on:
+      - core_db
+      - redis
+    restart: unless-stopped
+
+  # ----------------------------------------------------------------------------
+  # 3. Server 2: Reserved Service (Future Auth / Notifications)
+  # ----------------------------------------------------------------------------
+  server2_reserved:
+    build:
+      context: ./services/server2_reserved
+      dockerfile: Dockerfile
+    container_name: server2_reserved
+    networks:
+      - private_backend_net
+    restart: unless-stopped
+
+  # ----------------------------------------------------------------------------
+  # 4. Server 3: Payment Service (ACID Ledger & HMAC Webhooks)
+  # ----------------------------------------------------------------------------
+  server3_payment:
+    build:
+      context: ./services/server3_payment
+      dockerfile: Dockerfile
+    container_name: server3_payment
+    environment:
+      - PAYMENT_DB_HOST=payment_db
+      - PAYMENT_DB_USER=${POSTGRES_USER}
+      - PAYMENT_DB_PASSWORD=${POSTGRES_PASSWORD}
+      - PAYMENT_DB_NAME=${PAYMENT_DB_NAME}
+      - WEBHOOK_SECRET=${PAYMENT_WEBHOOK_SECRET}
+    networks:
+      - private_backend_net
+    depends_on:
+      - payment_db
+    restart: unless-stopped
+
+  # ----------------------------------------------------------------------------
+  # 5. Server 4: Reserved Service (Future Analytics / Event Ingestion)
+  # ----------------------------------------------------------------------------
+  server4_reserved:
+    build:
+      context: ./services/server4_reserved
+      dockerfile: Dockerfile
+    container_name: server4_reserved
+    networks:
+      - private_backend_net
+    restart: unless-stopped
+
+  # ----------------------------------------------------------------------------
+  # 6. Server 5: AI Automation Service (Redis Consumer & LLM Pipeline)
+  # ----------------------------------------------------------------------------
+  server5_ai:
+    build:
+      context: ./services/server5_ai_automation
+      dockerfile: Dockerfile
+    container_name: server5_ai
+    environment:
+      - REDIS_HOST=${REDIS_HOST}
+      - REDIS_PORT=${REDIS_PORT}
+      - REDIS_PASSWORD=${REDIS_PASSWORD}
+    networks:
+      - private_backend_net
+    depends_on:
+      - redis
+    restart: unless-stopped
+
+  # ----------------------------------------------------------------------------
+  # 7. Core Application Database (PostgreSQL 16)
+  # ----------------------------------------------------------------------------
+  core_db:
+    image: postgres:16-alpine
+    container_name: core_db
+    environment:
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_DB=${CORE_DB_NAME}
+    volumes:
+      - core_db_data:/var/lib/postgresql/data
+      - ./init_db/01_core_init.sql:/docker-entrypoint-initdb.d/01_core_init.sql:ro
+    networks:
+      - private_backend_net
+    restart: unless-stopped
+
+  # ----------------------------------------------------------------------------
+  # 8. Dedicated Payment Database (PostgreSQL 16 - ACID Double-Entry Ledger)
+  # ----------------------------------------------------------------------------
+  payment_db:
+    image: postgres:16-alpine
+    container_name: payment_db
+    environment:
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_DB=${PAYMENT_DB_NAME}
+    volumes:
+      - payment_db_data:/var/lib/postgresql/data
+      - ./init_db/02_payment_ledger_init.sql:/docker-entrypoint-initdb.d/02_payment_ledger_init.sql:ro
+    networks:
+      - private_backend_net
+    restart: unless-stopped
+
+  # ----------------------------------------------------------------------------
+  # 9. Message Queue: Redis 7
+  # ----------------------------------------------------------------------------
+  redis:
+    image: redis:7-alpine
+    container_name: redis_queue
+    command: redis-server --requirepass ${REDIS_PASSWORD} --appendonly yes
+    volumes:
+      - redis_data:/data
+    networks:
+      - private_backend_net
+    restart: unless-stopped
+
+  # ----------------------------------------------------------------------------
+  # 10. Monitoring: Prometheus Stack
+  # ----------------------------------------------------------------------------
+  prometheus:
+    image: prom/prometheus:v2.50.0
+    container_name: prometheus_monitoring
+    volumes:
+      - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus_data:/prometheus
+    networks:
+      - private_backend_net
+    restart: unless-stopped
+
+  # ----------------------------------------------------------------------------
+  # 11. Monitoring: Grafana Dashboards
+  # ----------------------------------------------------------------------------
+  grafana:
+    image: grafana/grafana:10.3.0
+    container_name: grafana_dashboards
+    environment:
+      - GF_SECURITY_ADMIN_USER=${GRAFANA_ADMIN_USER}
+      - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_ADMIN_PASSWORD}
+      - GF_USERS_ALLOW_SIGN_UP=false
+    volumes:
+      - ./monitoring/grafana/provisioning:/etc/grafana/provisioning:ro
+      - grafana_data:/var/lib/grafana
+    networks:
+      - private_backend_net
+    restart: unless-stopped

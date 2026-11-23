@@ -1,0 +1,33 @@
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+
+scrape_configs:
+  - job_name: 'prometheus'
+    static_configs:
+      - targets: ['localhost:9090']
+
+  - job_name: 'server1_core'
+    metrics_path: '/metrics'
+    static_configs:
+      - targets: ['server1_core:8001']
+
+  - job_name: 'server2_reserved'
+    metrics_path: '/metrics'
+    static_configs:
+      - targets: ['server2_reserved:8002']
+
+  - job_name: 'server3_payment'
+    metrics_path: '/metrics'
+    static_configs:
+      - targets: ['server3_payment:8003']
+
+  - job_name: 'server4_reserved'
+    metrics_path: '/metrics'
+    static_configs:
+      - targets: ['server4_reserved:8004']
+
+  - job_name: 'server5_ai'
+    metrics_path: '/metrics'
+    static_configs:
+      - targets: ['server5_ai:8005']
