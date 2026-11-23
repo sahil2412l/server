@@ -1,0 +1,10 @@
+{
+  "name": "server-api-gateway",
+  "version": "2.0.0",
+  "description": "Production Zero Trust Microservices Backend Architecture & API Gateway",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {}
+}
