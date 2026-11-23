@@ -184,11 +184,14 @@ services:
   prometheus:
     image: prom/prometheus:v2.50.0
     container_name: prometheus_monitoring
+    ports:
+      - "9090:9090"
     volumes:
       - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml:ro
       - prometheus_data:/prometheus
     networks:
       - private_backend_net
+      - public_net
     restart: unless-stopped
 
   # ----------------------------------------------------------------------------
@@ -197,6 +200,8 @@ services:
   grafana:
     image: grafana/grafana:10.3.0
     container_name: grafana_dashboards
+    ports:
+      - "3001:3000"
     environment:
       - GF_SECURITY_ADMIN_USER=${GRAFANA_ADMIN_USER}
       - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_ADMIN_PASSWORD}
@@ -206,4 +211,5 @@ services:
       - grafana_data:/var/lib/grafana
     networks:
       - private_backend_net
+      - public_net
     restart: unless-stopped
