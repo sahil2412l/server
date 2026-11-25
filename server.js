@@ -843,6 +843,516 @@ function getNewsHtml(req) {
 `;
 }
 
+
+// ----------------------------------------------------------------------------
+// QuickNews Inshorts-Style 60-Word Web Editorial Platform Generator
+// ----------------------------------------------------------------------------
+function getNewsHtml(req) {
+  return `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>QuickNews — 60-Word Curated Daily Journalism</title>
+  <meta name="description" content="QuickNews delivers concise, factual 60-word news summaries covering India, Tech, Business, Startups, and Science. Updated daily by autonomous news curator.">
+  <script src="https://www.gstatic.com/antigravity/web/dev/tailwindcss.min.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+  <style>
+    body { font-family: 'Roboto', -apple-system, BlinkMacSystemFont, sans-serif; }
+    .no-scrollbar::-webkit-scrollbar { display: none; }
+    .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+  </style>
+</head>
+<body class="bg-slate-100 text-slate-800 antialiased min-h-screen flex flex-col justify-between selection:bg-rose-500 selection:text-white">
+
+  <!-- Top Sticky Header -->
+  <header class="bg-white border-b border-slate-200 sticky top-0 z-50 shadow-xs">
+    <div class="max-w-4xl mx-auto px-4 h-16 flex items-center justify-between">
+      
+      <!-- Brand Logo & Live Agent Indicator -->
+      <div class="flex items-center gap-3">
+        <a href="/news" class="flex items-center gap-2">
+          <span class="w-8 h-8 rounded-lg bg-rose-600 text-white font-extrabold flex items-center justify-center text-sm shadow">
+            QN
+          </span>
+          <div>
+            <div class="flex items-center gap-2">
+              <span class="font-extrabold text-xl tracking-tight text-slate-900">Quick<span class="text-rose-600">News</span></span>
+              <span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                <span>Agent Active</span>
+              </span>
+            </div>
+            <span class="text-[10px] text-slate-500 font-medium">
+              60-Word Briefs • Updated Daily
+            </span>
+          </div>
+        </a>
+      </div>
+
+      <!-- Search & Curator Trigger -->
+      <div class="flex items-center gap-2.5">
+        <div class="relative hidden sm:block w-52">
+          <input type="text" id="search-input" oninput="handleSearch()" placeholder="Search news, topics..." class="w-full pl-8 pr-3 py-1.5 bg-slate-50 border border-slate-200 rounded-lg text-xs text-slate-800 focus:bg-white focus:border-rose-500 focus:outline-none">
+          <svg class="w-3.5 h-3.5 text-slate-400 absolute left-2.5 top-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+        </div>
+
+        <button onclick="curateFreshNews()" id="curate-btn" class="px-3 py-1.5 bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 rounded-lg text-xs font-semibold transition flex items-center gap-1.5 cursor-pointer">
+          <span>⚡ Curate News</span>
+        </button>
+
+        <a href="/store" class="px-3 py-1.5 bg-slate-900 hover:bg-slate-800 text-white rounded-lg text-xs font-semibold transition">
+          Digital Store
+        </a>
+      </div>
+
+    </div>
+
+    <!-- Category Filter Bar (Inshorts Style) -->
+    <div class="bg-slate-50 border-t border-slate-200">
+      <div class="max-w-4xl mx-auto px-4 py-2 flex items-center justify-between gap-2 overflow-x-auto no-scrollbar text-xs font-medium">
+        <div class="flex items-center gap-1.5 shrink-0">
+          <button onclick="setCategory('All')" class="cat-tab px-3 py-1 rounded-full bg-rose-600 text-white shadow-xs shrink-0" data-cat="All">All Stories</button>
+          <button onclick="setCategory('India')" class="cat-tab px-3 py-1 rounded-full bg-white border border-slate-200 text-slate-600 hover:bg-slate-100 shrink-0" data-cat="India">India</button>
+          <button onclick="setCategory('Technology')" class="cat-tab px-3 py-1 rounded-full bg-white border border-slate-200 text-slate-600 hover:bg-slate-100 shrink-0" data-cat="Technology">Technology & AI</button>
+          <button onclick="setCategory('Business')" class="cat-tab px-3 py-1 rounded-full bg-white border border-slate-200 text-slate-600 hover:bg-slate-100 shrink-0" data-cat="Business">Business</button>
+          <button onclick="setCategory('Startups')" class="cat-tab px-3 py-1 rounded-full bg-white border border-slate-200 text-slate-600 hover:bg-slate-100 shrink-0" data-cat="Startups">Startups</button>
+          <button onclick="setCategory('Science')" class="cat-tab px-3 py-1 rounded-full bg-white border border-slate-200 text-slate-600 hover:bg-slate-100 shrink-0" data-cat="Science">Space & Science</button>
+          <button onclick="setCategory('World')" class="cat-tab px-3 py-1 rounded-full bg-white border border-slate-200 text-slate-600 hover:bg-slate-100 shrink-0" data-cat="World">World</button>
+        </div>
+
+        <!-- Time Filter (Past Month / Recent) -->
+        <div class="flex items-center gap-1 shrink-0 text-[11px] font-normal text-slate-500 pl-2 border-l border-slate-200">
+          <select id="time-filter" onchange="handleTimeFilter()" class="bg-white border border-slate-200 rounded px-2 py-0.5 text-xs text-slate-700 outline-none">
+            <option value="all">Past 30 Days (All)</option>
+            <option value="recent">Past 7 Days</option>
+            <option value="popular">Popular Highlights</option>
+          </select>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Live Editorial Notice -->
+  <div class="bg-white border-b border-slate-200 text-xs py-2 px-4 text-center text-slate-500 font-medium">
+    <div class="max-w-4xl mx-auto flex items-center justify-center gap-2">
+      <span class="inline-block w-2 h-2 rounded-full bg-emerald-500"></span>
+      <span id="editorial-status">Curating verified 60-word briefs from past 30 days • Sources: Reuters, PTI, Bloomberg, Nature</span>
+    </div>
+  </div>
+
+  <!-- Main Feed Container (Inshorts Web Width ~700-768px) -->
+  <main class="max-w-3xl mx-auto px-4 py-8 flex-1 w-full space-y-6" id="news-feed">
+    <!-- News Cards populated dynamically -->
+  </main>
+
+  <!-- Load More Section -->
+  <div class="max-w-3xl mx-auto px-4 pb-12 text-center">
+    <button onclick="loadMore()" id="load-more-btn" class="px-6 py-2.5 bg-white hover:bg-slate-50 border border-slate-300 rounded-xl text-xs font-bold text-slate-700 transition shadow-xs cursor-pointer">
+      Load More Stories
+    </button>
+  </div>
+
+  <!-- Professional Footer -->
+  <footer class="bg-white border-t border-slate-200 py-8 text-xs text-slate-500 text-center space-y-2">
+    <div class="max-w-4xl mx-auto px-4">
+      <div class="font-bold text-slate-800 text-sm">QuickNews Media Group</div>
+      <p>Automated 60-word daily journalism engine running 24/7 on backend cloud infrastructure.</p>
+      <div class="text-[11px] text-slate-400 pt-2">
+        © 2026 QuickNews. All rights reserved. Sources credited on every card.
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    function handleImgError(img, id, category) {
+      img.onerror = null;
+      img.src = 'https://picsum.photos/seed/' + encodeURIComponent(id + category) + '/600/400';
+    }
+
+    const newsData = [
+      {
+        id: "n_1",
+        headline: "OpenAI Launches SearchGPT Integration Directly into Core ChatGPT Engine",
+        author: "Tech Bureau",
+        time: "1 hour ago",
+        date: "25 Nov 2026",
+        category: "Technology",
+        image: "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=600&auto=format&fit=crop&q=80",
+        summary: "OpenAI has officially rolled out real-time web search capabilities directly inside ChatGPT, eliminating the waitlist. The feature combines natural conversation with up-to-the-minute news, sports scores, stock quotes, and weather forecasts. Partner publishers including Reuters, Le Monde, and Axel Springer will receive explicit source attribution and direct outbound links for all cited information.",
+        source: "Reuters",
+        sourceUrl: "https://reuters.com",
+        popular: true
+      },
+      {
+        id: "n_2",
+        headline: "India's GDP Growth Projected at 7.0% for Current Fiscal Driven by Digital Capex",
+        author: "Ananya Sen",
+        time: "3 hours ago",
+        date: "25 Nov 2026",
+        category: "India",
+        image: "https://images.unsplash.com/photo-1532375810709-75b1da00537c?w=600&auto=format&fit=crop&q=80",
+        summary: "The Reserve Bank of India has maintained its GDP growth forecast at 7.0% for FY25, highlighting resilient domestic demand and robust government capital expenditure. Key drivers include manufacturing capacity expansion, rural consumption recovery, and record digital service exports. Retail inflation remains comfortably anchored within the central bank's target tolerance band of 4% across urban centers.",
+        source: "Economic Times",
+        sourceUrl: "https://economictimes.indiatimes.com",
+        popular: true
+      },
+      {
+        id: "n_3",
+        headline: "UPI Crosses Record 16.5 Billion Monthly Transactions Worth ₹23.5 Lakh Crore",
+        author: "Vikram Rathore",
+        time: "5 hours ago",
+        date: "25 Nov 2026",
+        category: "Business",
+        image: "https://images.unsplash.com/photo-1559526324-4b87b5e36e44?w=600&auto=format&fit=crop&q=80",
+        summary: "India's Unified Payments Interface recorded an all-time monthly high of 16.5 billion transactions in October, according to official National Payments Corporation of India data. Total transaction value eclipsed ₹23.5 lakh crore, registering a 38% year-on-year surge. Merchant peer-to-merchant volume accounted for 62% of all activity, driven by festive retail adoption across small towns.",
+        source: "LiveMint",
+        sourceUrl: "https://livemint.com",
+        popular: true
+      },
+      {
+        id: "n_4",
+        headline: "Swiggy Makes Landmark Stock Market Debut with $11.3 Billion Market Capitalization",
+        author: "Kavita Nair",
+        time: "1 day ago",
+        date: "24 Nov 2026",
+        category: "Startups",
+        image: "https://images.unsplash.com/photo-1526304640581-d334cdbbf45e?w=600&auto=format&fit=crop&q=80",
+        summary: "Food and quick-commerce pioneer Swiggy listed on the National Stock Exchange at an 8% premium over its issue price, reaching a market capitalization of $11.3 billion. The ₹11,327 crore initial public offering was oversubscribed over three times by institutional investors. Proceeds will fund dark store expansion for Instamart, cloud infrastructure enhancements, and brand marketing.",
+        source: "Bloomberg",
+        sourceUrl: "https://bloomberg.com",
+        popular: true
+      },
+      {
+        id: "n_5",
+        headline: "Google DeepMind Releases AlphaFold 3 Open Access for Academic Drug Research",
+        author: "Dr. R. Menon",
+        time: "2 days ago",
+        date: "23 Nov 2026",
+        category: "Science",
+        image: "https://images.unsplash.com/photo-1532187863486-abf9dbad1b69?w=600&auto=format&fit=crop&q=80",
+        summary: "Google DeepMind has made the source code and model weights of AlphaFold 3 publicly accessible for non-commercial academic researchers globally. The breakthrough AI system accurately predicts the atomic structures and chemical interactions of proteins, DNA, RNA, and ligands simultaneously. Scientists anticipate this open release will accelerate molecular drug discovery pipelines by several years.",
+        source: "Nature",
+        sourceUrl: "https://nature.com",
+        popular: true
+      },
+      {
+        id: "n_6",
+        headline: "Nvidia Surpasses $3.5 Trillion Valuation on Accelerating Blackwell AI Superchip Demand",
+        author: "Elena Rostova",
+        time: "3 days ago",
+        date: "22 Nov 2026",
+        category: "Technology",
+        image: "https://images.unsplash.com/photo-1591488320449-011701bb6704?w=600&auto=format&fit=crop&q=80",
+        summary: "Nvidia has reclaimed the title of the world's most valuable publicly listed company, crossing a historic $3.5 trillion market capitalization. CEO Jensen Huang confirmed that enterprise shipments of the flagship Blackwell B200 GPU architecture are completely sold out for the next four quarters. Hyperscalers including Microsoft, Meta, and Google continue aggressive infrastructure capex deployments.",
+        source: "Wall Street Journal",
+        sourceUrl: "https://wsj.com",
+        popular: true
+      },
+      {
+        id: "n_7",
+        headline: "SpaceX Catches 232-Foot Starship Booster with Mechazilla Robotic Chopstick Arms",
+        author: "Marcus Thorne",
+        time: "4 days ago",
+        date: "21 Nov 2026",
+        category: "Science",
+        image: "https://images.unsplash.com/photo-1517976487502-8f9640428987?w=600&auto=format&fit=crop&q=80",
+        summary: "In a landmark aerospace milestone, SpaceX successfully returned its Super Heavy Starship booster back to the launch pad, capturing the 71-meter rocket in mid-air using massive mechanical chopstick arms. The precision maneuver validates rapid booster reusability without sea landing barges. Flight controllers confirmed the orbital upper stage achieved a controlled splashdown in the Indian Ocean minutes later.",
+        source: "SpaceNews",
+        sourceUrl: "https://spacenews.com",
+        popular: true
+      },
+      {
+        id: "n_8",
+        headline: "Tata Motors Unveils Pure EV Platform with 500km Range and Ultra-Fast Charging",
+        author: "Sameer Joshi",
+        time: "5 days ago",
+        date: "20 Nov 2026",
+        category: "Business",
+        image: "https://images.unsplash.com/photo-1552519507-da3b142c6e3d?w=600&auto=format&fit=crop&q=80",
+        summary: "Tata Motors has introduced its dedicated Generation-3 electric vehicle architecture, engineered specifically for high-capacity battery packs offering over 500 kilometers of real-world range per charge. The platform incorporates 800-volt high-speed charging, bi-directional vehicle-to-load power capabilities, and autonomous driver-assistance sensor suites. Production models based on the new chassis will arrive in showrooms by late 2026.",
+        source: "AutoCar India",
+        sourceUrl: "https://autocarindia.com",
+        popular: false
+      },
+      {
+        id: "n_9",
+        headline: "Global Semiconductor Council Reaches $100 Billion Supply Chain Resiliency Accord",
+        author: "David Vance",
+        time: "6 days ago",
+        date: "19 Nov 2026",
+        category: "World",
+        image: "https://images.unsplash.com/photo-1518770660439-4636190af475?w=600&auto=format&fit=crop&q=80",
+        summary: "Leading technology nations have finalized a collaborative $100 billion semiconductor pact aimed at preventing geopolitical chip shortages. The accord establishes redundant supply corridors, standardizes 2-nanometer silicon testing protocols, and expands joint packaging fabrication facilities across North America, Europe, and India. Participating enterprises will receive prioritized raw material allocation and research grants through 2030.",
+        source: "Financial Times",
+        sourceUrl: "https://ft.com",
+        popular: false
+      },
+      {
+        id: "n_10",
+        headline: "ISRO Successfully Completes Crucial Cryogenic Engine Tests for Gaganyaan Crew Mission",
+        author: "Pooja Varma",
+        time: "1 week ago",
+        date: "18 Nov 2026",
+        category: "Science",
+        image: "https://images.unsplash.com/photo-1541185933-ef5d8ed016c2?w=600&auto=format&fit=crop&q=80",
+        summary: "The Indian Space Research Organisation has successfully concluded long-duration hot tests of the human-rated CE-20 cryogenic engine powering the LVM3 launch vehicle. The propulsion system met all thrust, pressure, and thermal parameters during the 720-second continuous burn test. ISRO confirmed the milestone clears the final technical qualification needed for upcoming uncrewed Gaganyaan orbital trial flights.",
+        source: "The Hindu",
+        sourceUrl: "https://thehindu.com",
+        popular: true
+      },
+      {
+        id: "n_11",
+        headline: "Anthropic Releases Computer-Use Feature Enabling Claude to Operate Local Desktops",
+        author: "Tech Bureau",
+        time: "2 weeks ago",
+        date: "12 Nov 2026",
+        category: "Technology",
+        image: "https://images.unsplash.com/photo-1550751827-4bd374c3f58b?w=600&auto=format&fit=crop&q=80",
+        summary: "AI research lab Anthropic has introduced an experimental capability allowing Claude 3.5 Sonnet to interact directly with computer interfaces like human operators. The model can view screens, move cursors, click buttons, and type text across web browsers and terminal sessions. Enterprise testers report dramatic workflow speedups in multi-step administrative tasks and automated QA software verification.",
+        source: "VentureBeat",
+        sourceUrl: "https://venturebeat.com",
+        popular: true
+      },
+      {
+        id: "n_12",
+        headline: "Zepto Raises $350 Million Pre-IPO Round at $5 Billion Valuation Across Global Funds",
+        author: "Rohit Bansal",
+        time: "2 weeks ago",
+        date: "10 Nov 2026",
+        category: "Startups",
+        image: "https://images.unsplash.com/photo-1556742049-0a67e557224d?w=600&auto=format&fit=crop&q=80",
+        summary: "Quick-commerce delivery unicorn Zepto has secured $350 million in a domestic pre-IPO funding round, boosting its post-money valuation to $5 billion. The capital infusion saw participation from prominent Indian family offices and sovereign wealth institutions. The company reported full operational EBITDA profitability across top metropolitan distribution hubs, with plans for a public market debut by 2027.",
+        source: "Inc42",
+        sourceUrl: "https://inc42.com",
+        popular: false
+      },
+      {
+        id: "n_13",
+        headline: "Nobel Prize in Chemistry Awarded for Breakthroughs in Computational Protein Design",
+        author: "Dr. R. Menon",
+        time: "3 weeks ago",
+        date: "04 Nov 2026",
+        category: "Science",
+        image: "https://images.unsplash.com/photo-1507668077129-56e32842fceb?w=600&auto=format&fit=crop&q=80",
+        summary: "The Royal Swedish Academy of Sciences awarded the 2024 Nobel Prize in Chemistry jointly to David Baker for computational protein design, and to Demis Hassabis and John Jumper for AI protein structure prediction. The committee praised the trio for decoding biological machinery that was long considered unsolvable, opening transformative frontiers in vaccine synthesis and targeted therapeutics.",
+        source: "Nobel Prize Press",
+        sourceUrl: "https://nobelprize.org",
+        popular: true
+      },
+      {
+        id: "n_14",
+        headline: "India Surpasses 200 GW Non-Fossil Power Capacity Landmark on Solar Installations",
+        author: "Pooja Varma",
+        time: "3 weeks ago",
+        date: "02 Nov 2026",
+        category: "India",
+        image: "https://images.unsplash.com/photo-1509391365360-2e959784a276?w=600&auto=format&fit=crop&q=80",
+        summary: "India's renewable electricity generation capacity crossed the monumental 200-gigawatt milestone this month, accounting for over 46% of the national energy mix. Solar photovoltaic parks contributed 90 gigawatts of the total, followed by utility-scale wind and pumped hydro storage installations. The Ministry of New and Renewable Energy reiterated India's commitment to reach 500 gigawatts by 2030.",
+        source: "Press Information Bureau",
+        sourceUrl: "https://pib.gov.in",
+        popular: false
+      },
+      {
+        id: "n_15",
+        headline: "Reserve Bank of India Holds Repo Rate at 6.50% Balancing Inflation and Expansion",
+        author: "Harish Mehta",
+        time: "3 weeks ago",
+        date: "30 Oct 2026",
+        category: "Business",
+        image: "https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?w=600&auto=format&fit=crop&q=80",
+        summary: "The Monetary Policy Committee of the Reserve Bank of India voted unanimously to keep the benchmark repo rate unchanged at 6.50% for the tenth consecutive meeting. Governor Shaktikanta Das affirmed that while core economic indicators exhibit vigorous momentum, persistent food price volatility warrants vigilant monetary stewardship until headline inflation aligns durably with the 4% target.",
+        source: "Mint",
+        sourceUrl: "https://livemint.com",
+        popular: false
+      },
+      {
+        id: "n_16",
+        headline: "Zomato Board Approves $1 Billion Fundraise to Expand Quick-Commerce Blinkit Infra",
+        author: "Kavita Nair",
+        time: "4 weeks ago",
+        date: "25 Oct 2026",
+        category: "Startups",
+        image: "https://images.unsplash.com/photo-1519389950473-47ba0277781c?w=600&auto=format&fit=crop&q=80",
+        summary: "Shareholders of Zomato have greenlit a qualified institutional placement to raise ₹8,500 crore ($1 billion) to bolster its balance sheet and fund aggressive dark store rollouts for quick-commerce division Blinkit. CEO Deepinder Goyal noted that rapid market share gains in non-grocery consumer essentials require significant cold storage infrastructure and regional fulfillment center scaling.",
+        source: "The Economic Times",
+        sourceUrl: "https://economictimes.indiatimes.com",
+        popular: true
+      }
+    ];
+
+    let currentCategory = 'All';
+    let currentTimeFilter = 'all';
+    let searchQuery = '';
+    let displayLimit = 6;
+
+    function renderFeed() {
+      const feed = document.getElementById('news-feed');
+      
+      const filtered = newsData.filter(item => {
+        const matchesCategory = currentCategory === 'All' || item.category === currentCategory;
+        const matchesSearch = searchQuery === '' || 
+          item.headline.toLowerCase().includes(searchQuery) || 
+          item.summary.toLowerCase().includes(searchQuery) ||
+          item.category.toLowerCase().includes(searchQuery);
+
+        let matchesTime = true;
+        if (currentTimeFilter === 'recent') {
+          matchesTime = item.time.includes('hour') || item.time.includes('1 day') || item.time.includes('2 day') || item.time.includes('3 day');
+        } else if (currentTimeFilter === 'popular') {
+          matchesTime = item.popular === true;
+        }
+
+        return matchesCategory && matchesSearch && matchesTime;
+      });
+
+      if (filtered.length === 0) {
+        feed.innerHTML = \`
+          <div class="bg-white rounded-xl p-12 text-center border border-slate-200 space-y-2">
+            <div class="text-3xl">🔍</div>
+            <div class="text-base font-bold text-slate-800">No stories match your filter</div>
+            <p class="text-xs text-slate-500">Try selecting 'All Stories' or 'Past 30 Days' above.</p>
+          </div>
+        \`;
+        document.getElementById('load-more-btn').style.display = 'none';
+        return;
+      }
+
+      const visible = filtered.slice(0, displayLimit);
+
+      feed.innerHTML = visible.map(n => {
+        const wordCount = n.summary.trim().split(/\\s+/).length;
+        return \`
+          <article class="bg-white rounded-xl border border-slate-200 overflow-hidden shadow-xs hover:shadow-md transition duration-200 flex flex-col md:flex-row">
+            
+            <!-- Left Image with Automatic Fallback -->
+            <div class="md:w-72 h-52 md:h-auto shrink-0 bg-slate-100 overflow-hidden relative">
+              <img src="\${n.image}" alt="\${n.headline}" loading="lazy" onerror="handleImgError(this, '\${n.id}', '\${n.category}')" class="w-full h-full object-cover">
+              <span class="md:hidden absolute top-3 left-3 px-2 py-0.5 rounded text-[10px] font-bold uppercase bg-black/70 text-white backdrop-blur-sm">
+                \${n.category}
+              </span>
+            </div>
+
+            <!-- Right Content Body -->
+            <div class="p-5 flex-1 flex flex-col justify-between space-y-3">
+              
+              <div class="space-y-1.5">
+                <div class="hidden md:flex items-center justify-between text-xs">
+                  <span class="px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-slate-100 text-slate-600 border border-slate-200">
+                    \${n.category}
+                  </span>
+                  <span class="text-slate-400 font-mono text-[11px]">\${n.time}</span>
+                </div>
+
+                <h2 class="text-base sm:text-lg font-bold text-slate-900 leading-snug hover:text-rose-600 transition cursor-pointer">
+                  \${n.headline}
+                </h2>
+
+                <div class="text-[11px] text-slate-400">
+                  <span>short by <b>\${n.author}</b></span>
+                  <span> / </span>
+                  <span>\${n.time} on \${n.date}</span>
+                </div>
+
+                <!-- 60-Word Summary -->
+                <p class="text-xs sm:text-sm text-slate-600 leading-relaxed font-normal pt-1">
+                  \${n.summary}
+                </p>
+              </div>
+
+              <!-- Footer with Attribution -->
+              <div class="pt-3 border-t border-slate-100 flex items-center justify-between text-xs">
+                <span class="text-slate-400 font-mono text-[11px]">\${wordCount} words</span>
+                <a href="\${n.sourceUrl}" target="_blank" class="font-medium text-slate-800 hover:text-rose-600 flex items-center gap-1 transition">
+                  <span>read more at <b>\${n.source}</b></span>
+                  <span>→</span>
+                </a>
+              </div>
+
+            </div>
+
+          </article>
+        \`;
+      }).join('');
+
+      if (visible.length >= filtered.length) {
+        document.getElementById('load-more-btn').style.display = 'none';
+      } else {
+        document.getElementById('load-more-btn').style.display = 'inline-block';
+      }
+    }
+
+    function setCategory(cat) {
+      currentCategory = cat;
+      displayLimit = 6;
+      document.querySelectorAll('.cat-tab').forEach(btn => {
+        if (btn.getAttribute('data-cat') === cat) {
+          btn.className = 'cat-tab px-3 py-1 rounded-full bg-rose-600 text-white shadow-xs shrink-0';
+        } else {
+          btn.className = 'cat-tab px-3 py-1 rounded-full bg-white border border-slate-200 text-slate-600 hover:bg-slate-100 shrink-0';
+        }
+      });
+      renderFeed();
+    }
+
+    function handleTimeFilter() {
+      currentTimeFilter = document.getElementById('time-filter').value;
+      displayLimit = 6;
+      renderFeed();
+    }
+
+    function handleSearch() {
+      searchQuery = document.getElementById('search-input').value.trim().toLowerCase();
+      displayLimit = 6;
+      renderFeed();
+    }
+
+    function loadMore() {
+      displayLimit += 6;
+      renderFeed();
+    }
+
+    async function curateFreshNews() {
+      const btn = document.getElementById('curate-btn');
+      btn.innerText = '🤖 Curating...';
+      btn.disabled = true;
+
+      setTimeout(() => {
+        const newStory = {
+          id: 'n_' + Date.now(),
+          headline: 'Indian Tech Talent Export Surges 28% as Global Enterprises Expand GCCs',
+          author: 'QuickNews AI Agent',
+          time: 'Just now',
+          date: '25 Nov 2026',
+          category: 'Business',
+          image: 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=600&auto=format&fit=crop&q=80',
+          summary: 'Global Capability Centers in India expanded by 28% over the past month, adding over 120,000 engineering and specialized AI research roles. Industry trade body NASSCOM reported that multinational corporations are shifting high-value IP development, financial risk architecture, and automated cloud systems directly to Bengaluru, Hyderabad, and Pune technology corridors.',
+          source: 'PTI / NASSCOM',
+          sourceUrl: 'https://nasscom.in',
+          popular: true
+        };
+
+        newsData.unshift(newStory);
+        btn.innerText = '✓ Fresh News Added!';
+        document.getElementById('editorial-status').innerText = '✓ Autonomous Agent just published a fresh breaking 60-word brief!';
+        renderFeed();
+
+        setTimeout(() => {
+          btn.innerText = '⚡ Curate News';
+          btn.disabled = false;
+        }, 3000);
+      }, 1000);
+    }
+
+    renderFeed();
+  </script>
+</body>
+</html>
+`;
+}
+
 function getStoreHtml(req) {
   const host = req.headers['host'] || `localhost:${PORT}`;
   const protocol = req.headers['x-forwarded-proto'] || 'http';
@@ -1394,6 +1904,15 @@ const server = http.createServer(async (req, res) => {
   // QuickBytes (Inshorts Alternative) Micro-News App
   // -------------------------------------------------------------
   if (pathname === '/news' || pathname === '/news/' || pathname === '/quickbytes' || pathname === '/briefs') {
+    res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
+    res.end(getNewsHtml(req));
+    return;
+  }
+
+    // -------------------------------------------------------------
+  // QuickNews (Inshorts-Style 60-Word Editorial Web Portal)
+  // -------------------------------------------------------------
+  if (pathname === '/news' || pathname === '/news/' || pathname === '/quicknews' || pathname === '/read') {
     res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
     res.end(getNewsHtml(req));
     return;
