@@ -172,6 +172,302 @@ setInterval(() => {
 // ----------------------------------------------------------------------------
 // 3. Human, Professional Light-Theme Storefront HTML Generator
 // ----------------------------------------------------------------------------
+
+// ----------------------------------------------------------------------------
+// QuickBytes Inshorts-Style 60-Word Micro-News App Generator
+// ----------------------------------------------------------------------------
+function getNewsHtml(req) {
+  return `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>QuickBytes | 60-Word Curated News & Insights</title>
+  <script src="https://www.gstatic.com/antigravity/web/dev/tailwindcss.min.js"></script>
+  <style>
+    .card-snap { scroll-snap-align: start; }
+    .no-scrollbar::-webkit-scrollbar { display: none; }
+    .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+  </style>
+</head>
+<body class="bg-transparent text-[var(--foreground)] antialiased p-0 m-0 text-xs">
+  <div class="py-2 space-y-3">
+    
+    <!-- App Navigation Header -->
+    <div class="flex items-center justify-between border-b border-[var(--card-border)] pb-2">
+      <div class="flex items-center gap-2">
+        <div class="w-7 h-7 rounded-lg bg-indigo-600 text-white font-extrabold flex items-center justify-center text-xs shadow-sm">
+          Q
+        </div>
+        <div>
+          <div class="font-bold text-sm tracking-tight text-[var(--foreground)] flex items-center gap-2">
+            <span>QuickBytes</span>
+            <span class="px-2 py-0.5 rounded text-[10px] font-mono bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">
+              60-WORD BRIEFS
+            </span>
+          </div>
+          <div class="text-[10px] text-[var(--muted-foreground)]">Alternative to Inshorts • Minimalist Factual News Feed</div>
+        </div>
+      </div>
+      <div class="flex items-center gap-2">
+        <span id="card-counter" class="text-[10px] font-mono text-[var(--muted-foreground)]">Card 1 of 5</span>
+      </div>
+    </div>
+
+    <!-- Category Pills Bar -->
+    <div class="flex items-center gap-1.5 overflow-x-auto no-scrollbar pb-1 text-[11px] font-medium">
+      <button onclick="switchCategory('All')" class="cat-filter px-3 py-1 rounded-full bg-indigo-600 text-white shrink-0 shadow-sm" data-cat="All">All Stories</button>
+      <button onclick="switchCategory('AI & Tech')" class="cat-filter px-3 py-1 rounded-full bg-[var(--card)] border border-[var(--card-border)] text-[var(--muted-foreground)] shrink-0 hover:text-[var(--foreground)]" data-cat="AI & Tech">AI & Tech</button>
+      <button onclick="switchCategory('Startups')" class="cat-filter px-3 py-1 rounded-full bg-[var(--card)] border border-[var(--card-border)] text-[var(--muted-foreground)] shrink-0 hover:text-[var(--foreground)]" data-cat="Startups">Startups</button>
+      <button onclick="switchCategory('Fintech')" class="cat-filter px-3 py-1 rounded-full bg-[var(--card)] border border-[var(--card-border)] text-[var(--muted-foreground)] shrink-0 hover:text-[var(--foreground)]" data-cat="Fintech">Fintech</button>
+      <button onclick="switchCategory('Security')" class="cat-filter px-3 py-1 rounded-full bg-[var(--card)] border border-[var(--card-border)] text-[var(--muted-foreground)] shrink-0 hover:text-[var(--foreground)]" data-cat="Security">Security</button>
+    </div>
+
+    <!-- Interactive Inshorts-style Card Container -->
+    <div class="max-w-md mx-auto">
+      <div id="card-box" class="rounded-2xl border border-[var(--card-border)] bg-[var(--card)] shadow-lg overflow-hidden transition-all duration-300">
+        
+        <!-- Hero Image Banner -->
+        <div class="relative h-44 w-full overflow-hidden bg-slate-900">
+          <img id="card-img" src="https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=600&auto=format&fit=crop&q=80" alt="News Image" class="w-full h-full object-cover">
+          <div class="absolute top-3 left-3">
+            <span id="card-category" class="px-2.5 py-1 rounded-md text-[10px] font-bold uppercase tracking-wider bg-black/70 backdrop-blur-md text-white border border-white/20">
+              AI & Tech
+            </span>
+          </div>
+          <div class="absolute bottom-2 right-3 text-[10px] font-mono text-white/80 bg-black/60 px-2 py-0.5 rounded backdrop-blur-sm" id="card-time">
+            2 hours ago
+          </div>
+        </div>
+
+        <!-- Card Content Body (Strict 60 Words) -->
+        <div class="p-4 space-y-3">
+          <h2 id="card-title" class="text-sm font-bold text-[var(--foreground)] leading-snug">
+            OpenAI Unveils Lightweight Edge Architecture for Autonomous Multi-Agent Swarms
+          </h2>
+
+          <p id="card-body" class="text-[11px] text-[var(--muted-foreground)] leading-relaxed">
+            OpenAI has officially launched a new lightweight AI architecture aimed at on-device inference with ultra-low latency. The company stated that the model reduces cloud compute costs by 65% while matching GPT-4o benchmarks in code generation and microservices orchestration. Early enterprise deployments show instant sub-10ms response times on local gateways without sacrificing contextual reasoning accuracy.
+          </p>
+
+          <!-- Source & Word Count -->
+          <div class="flex items-center justify-between text-[10px] pt-2 border-t border-[var(--card-border)] text-[var(--muted-foreground)] font-mono">
+            <span>Source: <a id="card-source" href="#" target="_blank" class="text-[var(--link)] underline font-bold">TechCrunch</a></span>
+            <span id="word-count" class="text-emerald-400">60 words</span>
+          </div>
+        </div>
+
+        <!-- Action Bar: Audio, Bookmark, Share, Navigation -->
+        <div class="px-4 py-2.5 bg-[var(--content)]/30 border-t border-[var(--card-border)] flex items-center justify-between">
+          <div class="flex items-center gap-2">
+            <!-- Audio Listen Button -->
+            <button onclick="toggleAudio()" id="audio-btn" class="px-2.5 py-1 rounded-lg bg-[var(--card)] hover:bg-[var(--card-border)] border border-[var(--card-border)] text-[var(--foreground)] text-[10px] font-medium flex items-center gap-1 transition">
+              <span id="audio-icon">🔊</span>
+              <span id="audio-text">Listen</span>
+            </button>
+
+            <!-- Share Button -->
+            <button onclick="shareStory()" class="px-2.5 py-1 rounded-lg bg-[var(--card)] hover:bg-[var(--card-border)] border border-[var(--card-border)] text-[var(--foreground)] text-[10px] font-medium flex items-center gap-1 transition">
+              <span>↗</span>
+              <span>Share</span>
+            </button>
+          </div>
+
+          <!-- Card Nav Controls (Swipe/Next) -->
+          <div class="flex items-center gap-1.5">
+            <button onclick="prevStory()" class="w-7 h-7 rounded-lg bg-[var(--card)] hover:bg-[var(--card-border)] border border-[var(--card-border)] flex items-center justify-center text-xs font-bold text-[var(--foreground)] transition">
+              ↑
+            </button>
+            <button onclick="nextStory()" class="w-7 h-7 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white flex items-center justify-center text-xs font-bold transition shadow-sm">
+              ↓
+            </button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Key App Features Breakdown -->
+    <div class="grid grid-cols-3 gap-2 text-[10px] pt-1">
+      <div class="p-2 rounded-lg border border-[var(--card-border)] bg-[var(--card)]/50">
+        <b class="text-[var(--foreground)] block">1. 60-Word Precision</b>
+        <span class="text-[var(--muted-foreground)]">कठोर 60 शब्दों का सारांश, कोई फालतू राय या क्लिकबेट नहीं।</span>
+      </div>
+      <div class="p-2 rounded-lg border border-[var(--card-border)] bg-[var(--card)]/50">
+        <b class="text-[var(--foreground)] block">2. Text-to-Speech</b>
+        <span class="text-[var(--muted-foreground)]">"Listen" बटन दबाते ही ब्राउज़र 60 शब्दों की खबर पढ़कर सुनाता है।</span>
+      </div>
+      <div class="p-2 rounded-lg border border-[var(--card-border)] bg-[var(--card)]/50">
+        <b class="text-[var(--foreground)] block">3. Vertical Navigation</b>
+        <span class="text-[var(--muted-foreground)]">ऊपर/नीचे स्वाइप या एरो बटन्स से कार्ड-बाय-कार्ड नेविगेशन।</span>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    const stories = [
+      {
+        id: 1,
+        category: 'AI & Tech',
+        time: '2 hours ago',
+        title: 'OpenAI Unveils Lightweight Edge Architecture for Autonomous Multi-Agent Swarms',
+        body: 'OpenAI has officially launched a new lightweight AI architecture aimed at on-device inference with ultra-low latency. The company stated that the model reduces cloud compute costs by 65% while matching GPT-4o benchmarks in code generation and microservices orchestration. Early enterprise deployments show instant sub-10ms response times on local gateways without sacrificing contextual reasoning accuracy.',
+        img: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=600&auto=format&fit=crop&q=80',
+        source: 'TechCrunch',
+        sourceUrl: 'https://techcrunch.com'
+      },
+      {
+        id: 2,
+        category: 'Fintech',
+        time: '3 hours ago',
+        title: 'RBI Expands Global UPI Remittances Across Eight New International Corridors',
+        body: 'The Reserve Bank of India has expanded cross-border UPI integration to eight additional countries including Singapore, UAE, and France. Travelers and non-resident citizens can now execute real-time peer-to-peer payments using standard Indian bank applications with instantaneous zero-fee currency conversion. Financial analysts project cross-border transaction volumes to surge past $15 billion within the next fiscal quarter.',
+        img: 'https://images.unsplash.com/photo-1559526324-4b87b5e36e44?w=600&auto=format&fit=crop&q=80',
+        source: 'Economic Times',
+        sourceUrl: 'https://economictimes.indiatimes.com'
+      },
+      {
+        id: 3,
+        category: 'Startups',
+        time: '4 hours ago',
+        title: 'Indian AI Startups Raise $1.2 Billion in Q3 Leading Enterprise Cloud Innovation',
+        body: 'Venture funding into Indian artificial intelligence ventures reached record quarterly highs this month, crossing $1.2 billion across 45 growth-stage rounds. Investors demonstrated strong appetite for autonomous sales agents, developer infrastructure, and localized linguistic models. Industry leaders attribute the rapid growth to aggressive enterprise digital transformation and cost-effective regional GPU compute availability.',
+        img: 'https://images.unsplash.com/photo-1519389950473-47ba0277781c?w=600&auto=format&fit=crop&q=80',
+        source: 'LiveMint',
+        sourceUrl: 'https://livemint.com'
+      },
+      {
+        id: 4,
+        category: 'Security',
+        time: '5 hours ago',
+        title: 'Zero Trust Security Gateway Protocols Made Mandatory for Cloud Banking',
+        body: 'Global cybersecurity regulatory bodies have mandated the strict implementation of Zero Trust architecture for all public-facing financial gateways. Under the new compliance framework, every microservice call must authenticate with short-lived mTLS tokens, strict per-IP rate limiting, and encrypted double-entry ledger audits. Organizations have been given an 18-month grace period to transition legacy monoliths into distributed clusters.',
+        img: 'https://images.unsplash.com/photo-1550751827-4bd374c3f58b?w=600&auto=format&fit=crop&q=80',
+        source: 'Reuters',
+        sourceUrl: 'https://reuters.com'
+      },
+      {
+        id: 5,
+        category: 'AI & Tech',
+        time: '6 hours ago',
+        title: 'PostgreSQL 16 High-Throughput Benchmarks Prove Superior for Financial Ledgers',
+        body: 'Independent database performance tests revealed that PostgreSQL 16 achieves 40% higher transaction throughput on double-entry accounting ledgers compared to legacy relational systems. Enhancements in query parallelization, logical replication, and B-tree deduplication allow modern microservices to maintain strict ACID compliance without performance degradation during peak concurrent payment spikes.',
+        img: 'https://images.unsplash.com/photo-1544383835-bda2bc66a55d?w=600&auto=format&fit=crop&q=80',
+        source: 'Dev.to',
+        sourceUrl: 'https://dev.to'
+      }
+    ];
+
+    let currentIndex = 0;
+    let filteredStories = [...stories];
+    let isSpeaking = false;
+
+    function renderCard(idx) {
+      if (filteredStories.length === 0) return;
+      const s = filteredStories[idx];
+      
+      document.getElementById('card-category').innerText = s.category;
+      document.getElementById('card-time').innerText = s.time;
+      document.getElementById('card-title').innerText = s.title;
+      document.getElementById('card-body').innerText = s.body;
+      document.getElementById('card-img').src = s.img;
+      document.getElementById('card-source').innerText = s.source;
+      document.getElementById('card-source').href = s.sourceUrl;
+      document.getElementById('card-counter').innerText = \`Card \${idx + 1} of \${filteredStories.length}\`;
+
+      const words = s.body.trim().split(/\\s+/).length;
+      document.getElementById('word-count').innerText = \`\${words} words\`;
+
+      stopAudio();
+    }
+
+    function nextStory() {
+      if (currentIndex < filteredStories.length - 1) {
+        currentIndex++;
+        renderCard(currentIndex);
+      } else {
+        currentIndex = 0;
+        renderCard(0);
+      }
+    }
+
+    function prevStory() {
+      if (currentIndex > 0) {
+        currentIndex--;
+        renderCard(currentIndex);
+      }
+    }
+
+    function switchCategory(cat) {
+      document.querySelectorAll('.cat-filter').forEach(btn => {
+        if (btn.getAttribute('data-cat') === cat) {
+          btn.className = 'cat-filter px-3 py-1 rounded-full bg-indigo-600 text-white shrink-0 shadow-sm';
+        } else {
+          btn.className = 'cat-filter px-3 py-1 rounded-full bg-[var(--card)] border border-[var(--card-border)] text-[var(--muted-foreground)] shrink-0 hover:text-[var(--foreground)]';
+        }
+      });
+
+      if (cat === 'All') {
+        filteredStories = [...stories];
+      } else {
+        filteredStories = stories.filter(s => s.category === cat);
+      }
+      currentIndex = 0;
+      renderCard(0);
+    }
+
+    function toggleAudio() {
+      if (isSpeaking) {
+        stopAudio();
+      } else {
+        playAudio();
+      }
+    }
+
+    function playAudio() {
+      if (!('speechSynthesis' in window)) {
+        alert('Text-to-speech not supported on this browser.');
+        return;
+      }
+      const s = filteredStories[currentIndex];
+      const textToRead = \`\${s.title}. \${s.body}\`;
+      const utterance = new SpeechSynthesisUtterance(textToRead);
+      utterance.rate = 1.0;
+      utterance.onend = () => stopAudio();
+      utterance.onerror = () => stopAudio();
+
+      window.speechSynthesis.speak(utterance);
+      isSpeaking = true;
+      document.getElementById('audio-icon').innerText = '⏹';
+      document.getElementById('audio-text').innerText = 'Stop';
+      document.getElementById('audio-btn').classList.add('bg-indigo-500/20', 'border-indigo-500');
+    }
+
+    function stopAudio() {
+      if ('speechSynthesis' in window) {
+        window.speechSynthesis.cancel();
+      }
+      isSpeaking = false;
+      document.getElementById('audio-icon').innerText = '🔊';
+      document.getElementById('audio-text').innerText = 'Listen';
+      document.getElementById('audio-btn').classList.remove('bg-indigo-500/20', 'border-indigo-500');
+    }
+
+    function shareStory() {
+      const s = filteredStories[currentIndex];
+      const shareText = \`*\${s.title}*\\n\\n\${s.body}\\n\\nRead more on QuickBytes: https://inshorts-alternative.com/news\`;
+      const url = \`https://api.whatsapp.com/send?text=\${encodeURIComponent(shareText)}\`;
+      window.open(url, '_blank');
+    }
+
+    renderCard(0);
+  </script>
+</body>
+</html>
+`;
+}
+
 function getStoreHtml(req) {
   const host = req.headers['host'] || `localhost:${PORT}`;
   const protocol = req.headers['x-forwarded-proto'] || 'http';
@@ -719,6 +1015,15 @@ const server = http.createServer(async (req, res) => {
   // -------------------------------------------------------------
   // Public Digital Storefront (Light-Theme, Clean, Human)
   // -------------------------------------------------------------
+    // -------------------------------------------------------------
+  // QuickBytes (Inshorts Alternative) Micro-News App
+  // -------------------------------------------------------------
+  if (pathname === '/news' || pathname === '/news/' || pathname === '/quickbytes' || pathname === '/briefs') {
+    res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
+    res.end(getNewsHtml(req));
+    return;
+  }
+
   if (pathname === '/store' || pathname === '/store/' || pathname === '/sales' || pathname === '/shop') {
     res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
     res.end(getStoreHtml(req));
